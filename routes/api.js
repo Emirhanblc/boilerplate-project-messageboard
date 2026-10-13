@@ -14,19 +14,26 @@ module.exports = function (app) {
         const board = req.params.board;
         const { text, delete_password } = req.body;
         
+        // Zaman objesini bir değişkene atayarak iki alanın da milisaniyesine kadar aynı olmasını garantiliyoruz
+        const currentDate = new Date(); 
+
         const newThread = new Thread({
           board: board,
           text: text,
-          delete_password: delete_password
+          delete_password: delete_password,
+          created_on: currentDate, // Elle zaman ataması
+          bumped_on: currentDate,  // Elle zaman ataması
+          reported: false,
+          replies: []
         });
         
-        await newThread.save();
-        // freeCodeCamp testleri yönlendirme (redirect) veya JSON bekleyebilir.
-        res.json(newThread);
+        const savedThread = await newThread.save();
+        res.json(savedThread);
       } catch (err) {
         res.status(500).send('Server Error');
       }
     })
+    }
     
     // 2. Konuları Listeleme (GET)
     .get(async (req, res) => {
@@ -184,4 +191,3 @@ module.exports = function (app) {
       }
     });
 
-};
