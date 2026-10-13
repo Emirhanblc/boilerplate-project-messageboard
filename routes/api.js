@@ -14,7 +14,7 @@ module.exports = function (app) {
         const board = req.params.board;
         const { text, delete_password } = req.body;
         
-        // Zaman objesini bir değişkene atayarak iki alanın da milisaniyesine kadar aynı olmasını garantiliyoruz
+        // Zaman objesini bir değişkene atayarak iki alanın da birebir aynı milisaniyede olmasını garantiliyoruz
         const currentDate = new Date(); 
 
         const newThread = new Thread({
@@ -33,7 +33,6 @@ module.exports = function (app) {
         res.status(500).send('Server Error');
       }
     })
-    }
     
     // 2. Konuları Listeleme (GET)
     .get(async (req, res) => {
@@ -112,14 +111,16 @@ module.exports = function (app) {
         const thread = await Thread.findById(thread_id);
         if (!thread) return res.send('Thread not found');
         
+        const currentDate = new Date();
+
         const newReply = {
           text: text,
           delete_password: delete_password,
-          created_on: new Date(),
+          created_on: currentDate,
           reported: false
         };
         
-        thread.bumped_on = new Date(); // Konuyu yukarı taşı
+        thread.bumped_on = currentDate; // Konuyu yukarı taşı
         thread.replies.push(newReply);
         
         await thread.save();
@@ -191,3 +192,4 @@ module.exports = function (app) {
       }
     });
 
+};
